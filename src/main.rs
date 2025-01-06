@@ -5,8 +5,14 @@ use std::collections::HashMap;
 mod config;
 use config::file as conf;
 
+#[derive(Debug)]
+pub struct Result {
+    pub value: f64,
+    pub message: String,
+}
+
 fn main() {
-    let mut function_map: HashMap<String, fn()> = HashMap::new();
+    let mut function_map: HashMap<String, fn() -> Result> = HashMap::new();
 
     let config = conf::parse_config();
     // Set an interval for checking load average
@@ -17,7 +23,7 @@ fn main() {
 
     loop {
         if let Some(func) = function_map.get(&config.function) {
-            func();
+            out( func() );
         }
         println!("{}", config.message);
         
@@ -26,7 +32,7 @@ fn main() {
     }
 }
 
-fn run() {
+fn run() -> Result {
     // Initialize the system info
     let mut system = System::new_all();
 
@@ -35,7 +41,13 @@ fn run() {
 
     // Get the load average
     let load_avg = System::load_average();
-    println!("Load Average: {:.2}, {:.2}, {:.2}", load_avg.one, load_avg.five, load_avg.fifteen);
+
+    // return load_avg.one
+    return Result { value: load_avg.one, message: "Hey".to_string()}
+}
+
+fn out(result: Result) {
+    println!("Value: {:.2}, message: {}", result.value, result.message);
 }
 
 
