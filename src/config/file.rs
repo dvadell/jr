@@ -10,7 +10,7 @@ pub fn parse_config() -> Config {
     // Parse the configuration into variables
     let mut parts = config.trim().splitn(3, "::");
     
-    if let (Some(n_str), Some(message), Some(function)) = (parts.next(), parts.next(), parts.next()) {
+    if let (Some(n_str), Some(function), Some(args)) = (parts.next(), parts.next(), parts.next()) {
         if let Ok(n) = n_str.parse::<u64>() {
             if n == 0 {
                 eprintln!("Invalid N value in config file");
@@ -18,8 +18,8 @@ pub fn parse_config() -> Config {
             }
             return Config {
                 n,
-                message: message.to_string(),
-                function: function.to_string()
+                function: function.to_string(),
+                args: args.to_string()
             };
         }
     }

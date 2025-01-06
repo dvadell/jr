@@ -1,8 +1,8 @@
 #[derive(Debug)]
 pub struct Config {
     pub n: u64,
-    pub message: String,
     pub function: String,
+    pub args: String
 }
 
 #[derive(Debug)]

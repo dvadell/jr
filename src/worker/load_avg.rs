@@ -1,7 +1,7 @@
 use sysinfo::System;
 use crate::types::Result;
 
-pub fn run() -> Result {
+pub fn run(_args: Option<&str>) -> Result {
     // Initialize the system info
     let mut system = System::new_all();
 
