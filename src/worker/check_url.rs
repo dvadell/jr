@@ -28,7 +28,7 @@ pub fn run(url: Option<&str>) -> Result {
                 }
             }
         },
-        Err(e) => {
+        Err(_e) => {
             Result {
                 value: 0.0,
                 message: "ERROR".to_string(),

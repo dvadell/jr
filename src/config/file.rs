@@ -1,29 +1,57 @@
 use std::fs;
-use std::process::exit;
 
 use crate::types::Config;
 
-pub fn parse_config() -> Config {
-    // Read the configuration file
-    let config = fs::read_to_string("jr.conf").expect("Failed to read config file");
-    
-    // Parse the configuration into variables
-    let mut parts = config.trim().splitn(3, "::");
+fn parse_line(line: &str) -> Option<Config> {
+    // Trim any leading/trailing whitespace and split the line by "::" up to 3 parts
+    let mut parts = line.trim().splitn(3, "::");
     
     if let (Some(n_str), Some(function), Some(args)) = (parts.next(), parts.next(), parts.next()) {
+        // Check for comment lines starting with # or //
+        if n_str.starts_with('#') || n_str.starts_with("//") {
+            return None;
+        }
+        
+        // Parse the first part as an unsigned 64-bit integer (`n`)
         if let Ok(n) = n_str.parse::<u64>() {
             if n == 0 {
-                eprintln!("Invalid N value in config file");
-                exit(1);
+                eprintln!("Invalid N value in config file at line: {}", line);
+                return None;
             }
-            return Config {
+            Some(Config {
                 n,
                 function: function.to_string(),
                 args: args.to_string()
-            };
+            })
+        } else {
+            eprintln!("Failed to parse N value in config file at line: {}", line);
+            None
+        }
+    } else if line.trim_start().starts_with('#') || line.trim_start().starts_with("//") {
+        // Ignore comment lines starting with # or //
+        None
+    } else {
+        eprintln!("Invalid format in config file at line: {}", line);
+        None
+    }
+}
+
+pub fn parse_config() -> Vec<Config> {
+    // Read the configuration file
+    let config = fs::read_to_string("jr.conf").expect("Failed to read config file");
+    
+    // Split the content into lines
+    let lines: Vec<&str> = config.trim().lines().collect();
+    
+    // Initialize a vector to store Config structures
+    let mut configs: Vec<Config> = Vec::new();
+    
+    // Iterate over each line and parse it into a Config structure
+    for line in lines {
+        if let Some(config) = parse_line(line) {
+            configs.push(config);
         }
     }
     
-    eprintln!("Failed to parse config file");
-    exit(1);
+    configs
 }
