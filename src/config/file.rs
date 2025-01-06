@@ -1,12 +1,7 @@
 use std::fs;
 use std::process::exit;
 
-#[derive(Debug)]
-pub struct Config {
-    pub n: u64,
-    pub message: String,
-    pub function: String,
-}
+use crate::types::Config;
 
 pub fn parse_config() -> Config {
     // Read the configuration file
