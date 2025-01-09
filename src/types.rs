@@ -5,8 +5,8 @@ pub struct Config {
     pub args: String
 }
 
-#[derive(Debug)]
-pub struct Result {
+#[derive(Debug, Clone)]
+pub struct WorkerResult {
     pub value: f64,
     pub message: String,
 }

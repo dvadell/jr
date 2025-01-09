@@ -1,7 +1,7 @@
 use sysinfo::System;
-use crate::types::Result;
+use crate::types::WorkerResult;
 
-pub fn run(_args: Option<&str>) -> Result {
+pub fn run(_args: Option<&str>) -> WorkerResult {
     // Initialize the system info
     let mut system = System::new_all();
 
@@ -12,5 +12,5 @@ pub fn run(_args: Option<&str>) -> Result {
     let load_avg = System::load_average();
 
     // return load_avg.one
-    return Result { value: load_avg.one, message: "Hey".to_string()}
+    return WorkerResult { value: load_avg.one, message: "Hey".to_string()}
 }

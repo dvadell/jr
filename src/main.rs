@@ -7,16 +7,17 @@ use config::file as conf;
 
 mod output;
 use output::stdout as out;
+use output::graphite;
 
 mod worker;
 use worker::check_url as check_url;
 use worker::load_avg as load_avg;
 
 mod types;
-use crate::types::Result;
+use crate::types::WorkerResult;
 
 fn main() {
-    let mut function_map: HashMap<String, fn(Option<&str>) -> Result> = HashMap::new();
+    let mut function_map: HashMap<String, fn(Option<&str>) -> WorkerResult> = HashMap::new();
 
     let configs = conf::parse_config();
     let now = Instant::now();
@@ -33,7 +34,9 @@ fn main() {
             if let Some(func) = function_map.get(&config.function) {
                 // Only run every config.n seconds
                 if iteration % config.n == 0 {
-                    out::run( func(Some(&config.args)) );
+                    let result = func(Some(&config.args));
+                    let _ = out::run( result.clone() );
+                    let _ = graphite::run( result.clone() );
                 }
             }
         }
