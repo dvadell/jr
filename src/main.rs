@@ -35,8 +35,8 @@ fn main() {
                 // Only run every config.n seconds
                 if iteration % config.n == 0 {
                     let result = func(Some(&config.args));
-                    let _ = out::run( result.clone() );
-                    let _ = graphite::run( result.clone() );
+                    let _ = out::run( result.clone(), config.clone() );
+                    let _ = graphite::run( result.clone(), config.clone() );
                 }
             }
         }

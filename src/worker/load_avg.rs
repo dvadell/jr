@@ -12,5 +12,5 @@ pub fn run(_args: Option<&str>) -> WorkerResult {
     let load_avg = System::load_average();
 
     // return load_avg.one
-    return WorkerResult { value: load_avg.one, message: "Hey".to_string()}
+    return WorkerResult { value: load_avg.one * 100.0, message: "Hey".to_string()}
 }
