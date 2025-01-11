@@ -7,8 +7,11 @@ pub fn run(result: WorkerResult, config: Config) ->  Result<(), Box<dyn std::err
     // Create a UDP socket bound to a random local port
     let socket = UdpSocket::bind("0.0.0.0:0")?;
 
+    let graph_short_name = result.graph_short_name.unwrap_or(config.function);
+    let value = result.graph_value.unwrap_or(result.value as u32);
+
     // Format the string according to the specified pattern
-    let formatted_data = format!("jr.{}:{}|g", config.function, result.value as u32); // Graphite gauge needs int
+    let formatted_data = format!("jr.{}:{}|g", graph_short_name, value); // Graphite gauge needs int
     println!("{}", formatted_data);
     let data = formatted_data.into_bytes();
     
