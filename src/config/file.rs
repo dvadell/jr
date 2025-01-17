@@ -4,9 +4,9 @@ use crate::types::Config;
 
 fn parse_line(line: &str) -> Option<Config> {
     // Trim any leading/trailing whitespace and split the line by "::" up to 3 parts
-    let mut parts = line.trim().splitn(3, "::");
+    let mut parts = line.trim().splitn(4, "::");
     
-    if let (Some(n_str), Some(function), Some(args)) = (parts.next(), parts.next(), parts.next()) {
+    if let (Some(short_name), Some(n_str), Some(function), Some(args)) = (parts.next(), parts.next(), parts.next(), parts.next()) {
         // Check for comment lines starting with # or //
         if n_str.starts_with('#') || n_str.starts_with("//") {
             return None;
@@ -22,6 +22,7 @@ fn parse_line(line: &str) -> Option<Config> {
                 n,
                 function: function.to_string(),
                 args: args.to_string(),
+                short_name: short_name.to_string(),
                 ..Default::default()
             })
         } else {

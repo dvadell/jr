@@ -6,7 +6,7 @@ use crate::types::{Config,Args};
 pub fn parse_config() -> Vec<Config>  {
     let args = Args::parse();
 
-    let _name = match &args.name {
+    let name = match &args.name {
         Some(name) => name,
         None => "No name"
     };
@@ -33,7 +33,8 @@ pub fn parse_config() -> Vec<Config>  {
             n: every as u64,
             once: args.once,
             function: "timethis".to_string(),
-            args: remaining_args_str
+            args: remaining_args_str,
+            short_name: name.to_string()
         });
     }
     configs

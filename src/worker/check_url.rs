@@ -1,9 +1,12 @@
 use std::time::Instant;
 
-use crate::types::WorkerResult;
+use crate::types::{Config,WorkerResult};
 
-pub fn run(url: Option<&str>) -> WorkerResult {
-    let url = url.unwrap_or("https://lwn.net");
+pub fn run(config: Config) -> WorkerResult {
+    let url = match config.args.trim().is_empty() {
+        true => "https://lwn.net",
+        false => config.args.trim()
+    };
     println!("Checking {}", url.to_string());
 
     // Start the timer

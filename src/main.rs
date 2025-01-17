@@ -14,10 +14,10 @@ use output::graphite;
 mod worker;
 use worker::check_url as check_url;
 use worker::load_avg as load_avg;
-use worker::timethis;
+use worker::timethis as timethis;
 
 mod types;
-use crate::types::{WorkerResult,Args};
+use crate::types::{WorkerResult,Args,Config};
 
 use clap::Parser;
 
@@ -37,7 +37,7 @@ fn main() {
         None => println!("The --name option was not provided."),
     }
 
-    let mut function_map: HashMap<String, fn(Option<&str>) -> WorkerResult> = HashMap::new();
+    let mut function_map: HashMap<String, fn(Config) -> WorkerResult> = HashMap::new();
 
     let mut configs = conf::parse_config();
     configs.extend_from_slice(&cmdline::parse_config());
@@ -61,7 +61,7 @@ fn main() {
             if let Some(func) = function_map.get(&config.function) {
                 // Only run every config.n seconds
                 if iteration % config.n == 0 {
-                    let result = func(Some(&config.args));
+                    let result = func(config.clone());
                     let _ = out::run( result.clone(), config.clone() );
                     let _ = graphite::run( result.clone(), config.clone() );
                 }

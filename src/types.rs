@@ -25,7 +25,8 @@ pub struct Config {
     pub n: u64,
     pub once: bool,
     pub function: String,
-    pub args: String
+    pub args: String,
+    pub short_name: String
 }
 
 #[derive(Debug, Clone)]

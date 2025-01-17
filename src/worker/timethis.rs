@@ -1,17 +1,10 @@
 use std::process::Command;
 use std::io;
 use std::time::Instant;
-use crate::types::WorkerResult;
+use crate::types::{Config,WorkerResult};
 
-pub fn run(args: Option<&str>) -> WorkerResult {
-    let command = match args {
-        Some(content) => content,
-        None => { 
-            return WorkerResult {
-                ..Default::default()
-            };
-        }
-    };
+pub fn run(config: Config) -> WorkerResult {
+    let command = config.args.as_str();
 
     let start = Instant::now();
 
@@ -23,7 +16,7 @@ pub fn run(args: Option<&str>) -> WorkerResult {
                 value: start.elapsed().as_millis() as f64,
                 message: "OK".to_string(),
                 graph_value: Some((start.elapsed().as_millis()) as u32),
-                graph_short_name: Some("Elapsed".to_string()),   // This should be the --name
+                graph_short_name: Some(config.short_name),
                 ..Default::default()
             };
 
@@ -34,7 +27,7 @@ pub fn run(args: Option<&str>) -> WorkerResult {
                 value: -1.0,
                 message: "Failed to execute command".to_string(),
                 graph_value: Some(0 as u32),
-                graph_short_name: Some("Elapsed".to_string()), // This should be the --name
+                graph_short_name: Some(config.short_name),
                 ..Default::default()
             };
         },
