@@ -21,7 +21,8 @@ fn parse_line(line: &str) -> Option<Config> {
             Some(Config {
                 n,
                 function: function.to_string(),
-                args: args.to_string()
+                args: args.to_string(),
+                ..Default::default()
             })
         } else {
             eprintln!("Failed to parse N value in config file at line: {}", line);
@@ -37,14 +38,17 @@ fn parse_line(line: &str) -> Option<Config> {
 }
 
 pub fn parse_config() -> Vec<Config> {
-    // Read the configuration file
-    let config = fs::read_to_string("jr.conf").expect("Failed to read config file");
+    // Initialize a vector to store Config structures
+    let mut configs: Vec<Config> = Vec::new();
+    
+    // Read the configuration file. Return empty configs if no config file.
+    let config = match fs::read_to_string("jr.conf") {
+        Ok(content) => content,
+        Err(_) => return configs
+    };
     
     // Split the content into lines
     let lines: Vec<&str> = config.trim().lines().collect();
-    
-    // Initialize a vector to store Config structures
-    let mut configs: Vec<Config> = Vec::new();
     
     // Iterate over each line and parse it into a Config structure
     for line in lines {
