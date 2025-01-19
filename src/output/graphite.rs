@@ -1,8 +1,12 @@
+use std::env;
 use std::net::UdpSocket;
 use crate::types::{WorkerResult,Config};
 
 pub fn run(result: WorkerResult, config: Config) ->  Result<(), Box<dyn std::error::Error>>  {
-    let ip_address = "127.0.0.1";
+    let ip_address = match env::var("GRAPHITE_SERVER") {
+        Ok(value) => value,
+        Err(_) => "127.0.0.1".to_string()
+    };
 
     // Create a UDP socket bound to a random local port
     let socket = UdpSocket::bind("0.0.0.0:0")?;
