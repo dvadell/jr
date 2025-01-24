@@ -10,6 +10,7 @@ use config::cmdline;
 mod output;
 use output::stdout as out;
 use output::graphite;
+use output::angelweb;
 
 mod worker;
 use worker::check_url as check_url;
@@ -28,13 +29,6 @@ fn main() {
 
     if let Some(every) = args.every {
         println!("Every option is set to: {}", every);
-    } else {
-        println!("The --every option was not provided.");
-    }
-
-    match &args.name {
-        Some(name) => println!("Name option is: {}", name),
-        None => println!("The --name option was not provided."),
     }
 
     let mut function_map: HashMap<String, fn(Config) -> WorkerResult> = HashMap::new();
@@ -64,6 +58,7 @@ fn main() {
                     let result = func(config.clone());
                     let _ = out::run( result.clone(), config.clone() );
                     let _ = graphite::run( result.clone(), config.clone() );
+                    let _ = angelweb::run( result.clone(), config.clone() );
                 }
             }
         }
