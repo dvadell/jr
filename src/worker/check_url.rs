@@ -45,3 +45,32 @@ pub fn run(config: Config) -> WorkerResult {
     }
 }
 
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::types::Config;
+
+    #[test]
+    fn test_check_url_success() {
+        let config = Config {
+            args: "https://www.google.com".to_string(),
+            ..Default::default()
+        };
+        let result = run(config);
+        assert_eq!(result.message, "Success");
+        assert!(result.value > 0.0);
+    }
+
+    #[test]
+    fn test_check_url_failure() {
+        let config = Config {
+            args: "https://nonexistent.url.fail".to_string(),
+            ..Default::default()
+        };
+        let result = run(config);
+        assert_eq!(result.message, "ERROR");
+        assert_eq!(result.value, 0.0);
+    }
+}
+

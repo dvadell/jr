@@ -25,3 +25,20 @@ pub fn run(config: Config) -> WorkerResult {
         ..Default::default()
     }
 }
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::types::Config;
+
+    #[test]
+    fn test_load_avg() {
+        let config = Config {
+            args: "localhost".to_string(),
+            ..Default::default()
+        };
+        let result = run(config);
+        assert!(result.value >= 0.0);
+    }
+}

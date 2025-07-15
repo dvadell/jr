@@ -63,3 +63,33 @@ fn run_command(command: &str) -> io::Result<()> {
     }
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::types::Config;
+
+    #[test]
+    fn test_timethis_success() {
+        let config = Config {
+            args: "echo hello".to_string(),
+            short_name: "test".to_string(),
+            ..Default::default()
+        };
+        let result = run(config);
+        assert_eq!(result.message, "OK");
+        assert!(result.value >= 0.0);
+    }
+
+    #[test]
+    fn test_timethis_failure() {
+        let config = Config {
+            args: "nonexistentcommand".to_string(),
+            short_name: "test".to_string(),
+            ..Default::default()
+        };
+        let result = run(config);
+        assert_eq!(result.message, "Failed to execute command");
+        assert_eq!(result.value, -1.0);
+    }
+}
