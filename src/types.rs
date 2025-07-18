@@ -3,19 +3,15 @@ use std::ffi::OsString;
 
 #[derive(Parser)]
 pub struct Args {
-    /// A number to specify the 'every' interval.
     #[arg(short, long)]
     pub every: Option<u32>,
 
-    /// A boolean flag for 'once'.
     #[arg(long)]
     pub once: bool,
 
-    /// A name string.
     #[arg(short, long)]
     pub name: Option<String>,
 
-    /// Remaining arguments
     #[arg(last = true)]
     pub remaining_args: Vec<OsString>,
 }
@@ -32,6 +28,7 @@ pub struct Config {
 #[derive(Debug, Clone)]
 pub struct WorkerResult {
     pub value: f64,
+    pub units: Option<String>,
     pub message: String,
     pub graph_value: Option<u32>,
     pub graph_type: Option<String>,
@@ -43,6 +40,7 @@ impl Default for WorkerResult {
     fn default() -> Self {
         WorkerResult { 
             value: 0.0,
+            units: None,
             message: "".to_string(),
             graph_value: Some(0),
             graph_type: Some("g".to_string()),

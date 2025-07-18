@@ -22,6 +22,7 @@ pub fn run(config: Config) -> WorkerResult {
             if response.status().is_success() {
                 WorkerResult {
                     value: duration,
+                    units: Some("ms".to_string()),
                     message: "Success".to_string(),
                     graph_value: Some(duration as u32),
                     ..Default::default()
@@ -29,6 +30,7 @@ pub fn run(config: Config) -> WorkerResult {
             } else {
                 WorkerResult {
                     value: duration,
+                    units: Some("ms".to_string()),
                     message: format!("HTTP error: {}", response.status()),
                     graph_value: Some(duration as u32),
                     ..Default::default()
@@ -38,6 +40,7 @@ pub fn run(config: Config) -> WorkerResult {
         Err(_e) => {
             WorkerResult {
                 value: 0.0,
+                units: Some("ms".to_string()),
                 message: "ERROR".to_string(),
                 ..Default::default()
             }

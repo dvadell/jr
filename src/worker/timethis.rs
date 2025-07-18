@@ -14,6 +14,7 @@ pub fn run(config: Config) -> WorkerResult {
             println!("Command executed successfully.");
             return WorkerResult { 
                 value: start.elapsed().as_millis() as f64,
+                units: Some("ms".to_string()),
                 message: "OK".to_string(),
                 graph_value: Some((start.elapsed().as_millis()) as u32),
                 graph_short_name: Some(config.short_name),
@@ -25,6 +26,7 @@ pub fn run(config: Config) -> WorkerResult {
             eprintln!("Failed to execute command: {}", e);
             return WorkerResult { 
                 value: -1.0,
+                units: Some("ms".to_string()),
                 message: "Failed to execute command".to_string(),
                 graph_value: Some(0 as u32),
                 graph_short_name: Some(config.short_name),

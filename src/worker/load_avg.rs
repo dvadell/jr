@@ -21,7 +21,7 @@ pub fn run(config: Config) -> WorkerResult {
         value: load_avg.one * 100.0, 
         message: "Hey".to_string(),
         graph_value: Some((load_avg.one * 100.0) as u32),
-        graph_short_name: Some(format!("load_avg {}", hostname)),
+        graph_short_name: Some(format!("load_avg_{}", hostname)),
         ..Default::default()
     }
 }
