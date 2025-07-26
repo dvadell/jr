@@ -12,6 +12,9 @@ pub struct Args {
     #[arg(short, long)]
     pub name: Option<String>,
 
+    #[arg(short, long)]
+    pub worker: Option<String>,
+
     #[arg(last = true)]
     pub remaining_args: Vec<OsString>,
 }

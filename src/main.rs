@@ -18,19 +18,10 @@ use worker::load_avg as load_avg;
 use worker::timethis as timethis;
 
 mod types;
-use crate::types::{WorkerResult,Args,Config};
-
-use clap::Parser;
-
+use crate::types::{WorkerResult,Config};
 
 
 fn main() {
-    let args = Args::parse();
-
-    if let Some(every) = args.every {
-        println!("Every option is set to: {}", every);
-    }
-
     let mut function_map: HashMap<String, fn(Config) -> WorkerResult> = HashMap::new();
 
     let mut configs = conf::parse_config();
@@ -68,7 +59,7 @@ fn main() {
         let elapsed_nanos = now.elapsed().as_nanos();
         sleep(Duration::new(0, 1_000_000_000 - (elapsed_nanos % 1_000_000_000) as u32 ));
 
-        if args.once {
+        if configs.iter().any(|c| c.once) {
             break;
         }
     }

@@ -5,10 +5,22 @@ use std::env;
 use crate::types::{Config,Args};
 
 pub fn parse_config() -> Vec<Config>  {
+    let args = env::args_os().collect::<Vec<_>>();
+    parse_config_from_args(args)
+}
+
+pub fn parse_config_from_args(args: Vec<OsString>) -> Vec<Config> {
     // Initialize a vector to store Config structures
     let mut configs: Vec<Config> = Vec::new();
-    let args = Args::parse();
+    let args = match Args::try_parse_from(args) {
+        Ok(args) => args,
+        Err(_) => return configs,
+    };
 
+    let worker = match args.worker {
+        Some(every) => every,
+        None => "timethis".to_string(),
+    };
     
     let every = match args.every {
         Some(every) => every,
@@ -29,16 +41,14 @@ pub fn parse_config() -> Vec<Config>  {
         None => &placeholder_name(&remaining_args_str)
     };
     
-    if ! remaining_args_str.is_empty() {
-        configs.push(Config {
-            n: every as u64,
-            once: args.once,
-            function: "timethis".to_string(),
-            group: "".to_string(),
-            args: remaining_args_str,
-            short_name: name.to_string()
-        });
-    }
+    configs.push(Config {
+        n: every as u64,
+        once: args.once,
+        function: worker,
+        group: "".to_string(),
+        args: remaining_args_str,
+        short_name: name.to_string()
+    });
     configs
 }
 
@@ -54,4 +64,18 @@ fn placeholder_name(remaining_args_str: &String) -> String {
     };
 
     format!("{}_{}", cmd_name , hostname)
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::config::cmdline::parse_config_from_args;
+    use std::ffi::OsString;
+
+    #[test]
+    fn test_worker_flag() {
+        let args: Vec<OsString> = vec!["jr".into(), "--worker".into(), "test_worker".into()];
+        let config = parse_config_from_args(args);
+        assert_eq!(config.len(), 1);
+        assert_eq!(config[0].function, "test_worker");
+    }
 }
