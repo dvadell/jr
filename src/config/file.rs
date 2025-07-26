@@ -2,15 +2,12 @@ use std::fs;
 
 use crate::types::Config;
 
-fn parse_line(line: &str) -> Option<Config> {
+fn parse_line(line: &str, curr_group: &str) -> Option<Config> {
     // Trim any leading/trailing whitespace and split the line by "::" up to 3 parts
     let mut parts = line.trim().splitn(4, "::");
     
     if line.trim().is_empty() || line.trim_start().starts_with('#') || line.trim_start().starts_with("//") {
         // Ignore empty lines and comment lines starting with # or //
-        None
-    } else if let Some(group_name) = line.split_whitespace().nth(1) {
-        curr_group = group_name;
         None
     } else if let (Some(short_name), Some(n_str), Some(function), Some(args)) = (parts.next(), parts.next(), parts.next(), parts.next()) {
         // Parse the first part as an unsigned 64-bit integer (`n`)
@@ -57,10 +54,10 @@ pub fn parse_config() -> Vec<Config> {
             if let Some(group_name) = line.split_whitespace().nth(1) {
                 curr_group = group_name;
             }
-        }
-        else if let Some(mut config) = parse_line(line) {
-            config.group = curr_group.to_string();
-            configs.push(config);
+        } else {
+            if let Some(mut config) = parse_line(line, curr_group) {
+                configs.push(config);
+            }
         }
     }
     configs
