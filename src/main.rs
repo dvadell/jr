@@ -16,6 +16,7 @@ mod worker;
 use worker::check_url as check_url;
 use worker::load_avg as load_avg;
 use worker::timethis as timethis;
+use worker::runthis as runthis;
 
 mod types;
 use crate::types::{WorkerResult,Config};
@@ -37,6 +38,7 @@ fn main() {
     function_map.insert("check_url".to_string(), check_url::run);
     function_map.insert("load_avg".to_string(), load_avg::run);
     function_map.insert("timethis".to_string(), timethis::run);
+    function_map.insert("runthis".to_string(), runthis::run);
 
     loop {
         let start_time = now.elapsed().as_millis();

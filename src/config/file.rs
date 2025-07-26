@@ -55,15 +55,13 @@ pub fn parse_config() -> Vec<Config> {
                 curr_group = group_name;
             }
         } else {
-            if let Some(mut config) = parse_line(line, curr_group) {
+            if let Some(config) = parse_line(line, curr_group) {
                 configs.push(config);
             }
         }
     }
     configs
 }
-
-use std::env;
 
 #[test]
 fn test_parse_config() {
@@ -88,6 +86,7 @@ test6::60::timethis::echo world
     fs::write(&config_path, config_content).unwrap();
 
     // Go to the temp directory and load the configuration.
+    use std::env;
     let _ = env::set_current_dir(&temp_dir);
     let configs = parse_config();
 
