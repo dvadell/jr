@@ -6,12 +6,10 @@ fn parse_line(line: &str) -> Option<Config> {
     // Trim any leading/trailing whitespace and split the line by "::" up to 3 parts
     let mut parts = line.trim().splitn(4, "::");
     
-    if let (Some(short_name), Some(n_str), Some(function), Some(args)) = (parts.next(), parts.next(), parts.next(), parts.next()) {
-        // Check for comment lines starting with # or //
-        if n_str.starts_with('#') || n_str.starts_with("//") {
-            return None;
-        }
-        
+    if line.trim_start().starts_with('#') || line.trim_start().starts_with("//") {
+        // Ignore comment lines starting with # or //
+        None
+    } else if let (Some(short_name), Some(n_str), Some(function), Some(args)) = (parts.next(), parts.next(), parts.next(), parts.next()) {
         // Parse the first part as an unsigned 64-bit integer (`n`)
         if let Ok(n) = n_str.parse::<u64>() {
             if n == 0 {
@@ -29,9 +27,6 @@ fn parse_line(line: &str) -> Option<Config> {
             eprintln!("Failed to parse N value in config file at line: {}", line);
             None
         }
-    } else if line.trim_start().starts_with('#') || line.trim_start().starts_with("//") {
-        // Ignore comment lines starting with # or //
-        None
     } else {
         eprintln!("Invalid format in config file at line: {}", line);
         None
@@ -41,6 +36,7 @@ fn parse_line(line: &str) -> Option<Config> {
 pub fn parse_config() -> Vec<Config> {
     // Initialize a vector to store Config structures
     let mut configs: Vec<Config> = Vec::new();
+    let mut curr_group = "Default";
     
     // Read the configuration file. Return empty configs if no config file.
     let config = match fs::read_to_string("jr.conf") {
@@ -53,10 +49,15 @@ pub fn parse_config() -> Vec<Config> {
     
     // Iterate over each line and parse it into a Config structure
     for line in lines {
-        if let Some(config) = parse_line(line) {
+        if line.trim_start().starts_with("Group") {
+            if let Some(group_name) = line.split_whitespace().nth(1) {
+                curr_group = group_name;
+            }
+        }
+        else if let Some(mut config) = parse_line(line) {
+            config.group = curr_group.to_string();
             configs.push(config);
         }
     }
-    
     configs
 }

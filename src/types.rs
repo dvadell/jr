@@ -21,6 +21,7 @@ pub struct Config {
     pub n: u64,
     pub once: bool,
     pub function: String,
+    pub group: String,
     pub args: String,
     pub short_name: String
 }
@@ -29,6 +30,7 @@ pub struct Config {
 pub struct WorkerResult {
     pub value: f64,
     pub units: Option<String>,
+    pub group: Option<String>,
     pub message: String,
     pub graph_value: Option<u32>,
     pub graph_type: Option<String>,
@@ -41,6 +43,7 @@ impl Default for WorkerResult {
         WorkerResult { 
             value: 0.0,
             units: None,
+            group: None,
             message: "".to_string(),
             graph_value: Some(0),
             graph_type: Some("g".to_string()),

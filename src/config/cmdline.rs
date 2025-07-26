@@ -34,6 +34,7 @@ pub fn parse_config() -> Vec<Config>  {
             n: every as u64,
             once: args.once,
             function: "timethis".to_string(),
+            group: "".to_string(),
             args: remaining_args_str,
             short_name: name.to_string()
         });
