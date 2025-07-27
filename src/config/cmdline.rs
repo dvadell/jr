@@ -12,10 +12,12 @@ pub fn parse_config() -> Vec<Config>  {
 pub fn parse_config_from_args(args: Vec<OsString>) -> Vec<Config> {
     // Initialize a vector to store Config structures
     let mut configs: Vec<Config> = Vec::new();
-    let args = match Args::try_parse_from(args) {
-        Ok(args) => args,
-        Err(_) => return configs,
-    };
+    let args = Args::parse_from(args);
+
+    if args.version {
+        println!("jr {}", env!("CARGO_PKG_VERSION"));
+        std::process::exit(0);
+    }
 
     let worker = match args.worker {
         Some(every) => every,
