@@ -17,6 +17,9 @@ pub struct Args {
 
     #[arg(last = true)]
     pub remaining_args: Vec<OsString>,
+
+    #[arg(short, long)]
+    pub version: bool,
 }
 
 #[derive(Debug, Clone, Default)]
