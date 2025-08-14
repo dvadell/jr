@@ -15,6 +15,12 @@ pub struct Args {
     #[arg(short, long)]
     pub worker: Option<String>,
 
+    #[arg(long)]
+    pub min_value: Option<f64>,
+
+    #[arg(long)]
+    pub max_value: Option<f64>,
+
     #[arg(last = true)]
     pub remaining_args: Vec<OsString>,
 
@@ -31,6 +37,8 @@ pub struct Metric {
     pub group: String,
     pub args: String,
     pub short_name: String,
+    pub min_value: Option<f64>,
+    pub max_value: Option<f64>,
 
     // From WorkerResult
     pub value: Option<f64>,

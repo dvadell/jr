@@ -50,6 +50,8 @@ pub fn parse_config_from_args(args: Vec<OsString>) -> Vec<Metric> {
         group: "".to_string(),
         args: remaining_args_str,
         short_name: name.to_string(),
+        min_value: args.min_value,
+        max_value: args.max_value,
         ..Default::default()
     });
     configs
