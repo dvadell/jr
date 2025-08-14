@@ -28,7 +28,7 @@ fn main() {
     let mut configs = conf::parse_config();
     configs.extend_from_slice(&cmdline::parse_config());
     if configs.len() == 0 {
-        eprintln!("Nothing to do");
+        eprintln!("No configuration found. Please provide command-line arguments or a configuration file. Use `jr --help` for more information.");
         exit(1);
     }
 

@@ -1,9 +1,26 @@
 // An output plugin to push the measure to angelweb.
 use std::env;
+use std::fs;
 use serde_json::json;
 use crate::types::Metric;
 
 pub fn run(metric: &Metric) ->  Result<(), Box<dyn std::error::Error>>  {
+    // If JR_TEST_OUTPUT_FILE is set, write the JSON payload to the specified file
+    if let Ok(output_file) = env::var("JR_TEST_OUTPUT_FILE") {
+        let payload = json!({
+            "short_name": metric.short_name,
+            "graph_value": metric.graph_value.unwrap_or(0),
+            "units": metric.units.as_deref().unwrap_or(""),
+            "group": metric.group,
+            "reporter": "jr@mordor",
+            "type": metric.graph_type.as_deref().unwrap_or("g"),
+            "min_value": metric.min_value,
+            "max_value": metric.max_value
+        });
+        fs::write(output_file, serde_json::to_string_pretty(&payload)?)?;
+        return Ok(());
+    }
+
     let angelweb_server = env::var("ANGELWEB_SERVER").unwrap_or_else(|_| "http://127.0.0.1:4000".to_string());
 
     // graph_value and graph_short_name

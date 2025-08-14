@@ -35,6 +35,10 @@ pub fn parse_config_from_args(args: Vec<OsString>) -> Vec<Metric> {
     .map(Result::unwrap)
     .collect::<Vec<_>>()
     .join(" ");
+
+    if remaining_args_str.is_empty() && (worker == "timethis" || worker == "runthis") {
+        return Vec::new();
+    }
     
     println!("Arguments: {}", remaining_args_str);
     
