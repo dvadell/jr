@@ -2,16 +2,16 @@ use clap::Parser;
 use std::ffi::OsString;
 use std::env;
 
-use crate::types::{Config,Args};
+use crate::types::{Metric,Args};
 
-pub fn parse_config() -> Vec<Config>  {
+pub fn parse_config() -> Vec<Metric>  {
     let args = env::args_os().collect::<Vec<_>>();
     parse_config_from_args(args)
 }
 
-pub fn parse_config_from_args(args: Vec<OsString>) -> Vec<Config> {
+pub fn parse_config_from_args(args: Vec<OsString>) -> Vec<Metric> {
     // Initialize a vector to store Config structures
-    let mut configs: Vec<Config> = Vec::new();
+    let mut configs: Vec<Metric> = Vec::new();
     let args = Args::parse_from(args);
 
     if args.version {
@@ -43,13 +43,14 @@ pub fn parse_config_from_args(args: Vec<OsString>) -> Vec<Config> {
         None => &placeholder_name(&remaining_args_str)
     };
     
-    configs.push(Config {
+    configs.push(Metric {
         n: every as u64,
         once: args.once,
         function: worker,
         group: "".to_string(),
         args: remaining_args_str,
-        short_name: name.to_string()
+        short_name: name.to_string(),
+        ..Default::default()
     });
     configs
 }

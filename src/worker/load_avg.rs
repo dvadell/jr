@@ -1,7 +1,7 @@
 use sysinfo::System;
-use crate::types::{Config,WorkerResult};
+use crate::types::Metric;
 
-pub fn run(config: Config) -> WorkerResult {
+pub fn run(mut metric: Metric) -> Metric {
     // Initialize the system info
     let mut system = System::new_all();
 
@@ -11,34 +11,31 @@ pub fn run(config: Config) -> WorkerResult {
     // Get the load average
     let load_avg = System::load_average();
 
-    let hostname = match config.args.trim().is_empty() {
+    let hostname = match metric.args.trim().is_empty() {
         true => "localhost",
-        false => config.args.trim()
+        false => metric.args.trim()
     };
 
-    // return load_avg.one
-    return WorkerResult { 
-        value: load_avg.one * 100.0, 
-        message: "Hey".to_string(),
-        graph_value: Some((load_avg.one * 100.0) as u32),
-        graph_short_name: Some(format!("load_avg_{}", hostname)),
-        ..Default::default()
-    }
+    metric.value = Some(load_avg.one * 100.0);
+    metric.message = Some("Hey".to_string());
+    metric.graph_value = Some((load_avg.one * 100.0) as u32);
+    metric.graph_short_name = Some(format!("load_avg_{}", hostname));
+    metric
 }
 
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::types::Config;
+    use crate::types::Metric;
 
     #[test]
     fn test_load_avg() {
-        let config = Config {
+        let metric = Metric {
             args: "localhost".to_string(),
             ..Default::default()
         };
-        let result = run(config);
-        assert!(result.value >= 0.0);
+        let result = run(metric);
+        assert!(result.value.unwrap() >= 0.0);
     }
 }

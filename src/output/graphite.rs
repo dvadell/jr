@@ -1,8 +1,8 @@
 use std::env;
 use std::net::UdpSocket;
-use crate::types::{WorkerResult,Config};
+use crate::types::Metric;
 
-pub fn run(result: WorkerResult, config: Config) ->  Result<(), Box<dyn std::error::Error>>  {
+pub fn run(metric: &Metric) ->  Result<(), Box<dyn std::error::Error>>  {
     let ip_address = match env::var("GRAPHITE_SERVER") {
         Ok(value) => value,
         Err(_) => "127.0.0.1".to_string()
@@ -11,8 +11,8 @@ pub fn run(result: WorkerResult, config: Config) ->  Result<(), Box<dyn std::err
     // Create a UDP socket bound to a random local port
     let socket = UdpSocket::bind("0.0.0.0:0")?;
 
-    let graph_short_name = result.graph_short_name.unwrap_or(config.function);
-    let value = result.graph_value.unwrap_or(result.value as u32);
+    let graph_short_name = metric.graph_short_name.as_deref().unwrap_or(&metric.function);
+    let value = metric.graph_value.unwrap_or(metric.value.unwrap_or_default() as u32);
 
     // Format the string according to the specified pattern
     let formatted_data = format!("jr.{}:{}|g", graph_short_name, value); // Graphite gauge needs int

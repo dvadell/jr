@@ -1,17 +1,17 @@
 // An output plugin to push the measure to angelweb.
 use std::env;
 use serde_json::json;
-use crate::types::{Config,WorkerResult};
+use crate::types::Metric;
 
-pub fn run(result: WorkerResult, config: Config) ->  Result<(), Box<dyn std::error::Error>>  {
+pub fn run(metric: &Metric) ->  Result<(), Box<dyn std::error::Error>>  {
     let angelweb_server = env::var("ANGELWEB_SERVER").unwrap_or_else(|_| "http://127.0.0.1:4000".to_string());
 
     // graph_value and graph_short_name
-    let units = result.units.unwrap_or("".to_string());
-    let group = config.group;
-    let value: u32 = result.graph_value.unwrap_or(0);
-    let short_name = result.graph_short_name.ok_or("no_name")?;
-    let graph_type = result.graph_type.unwrap_or("g".to_string());
+    let units = metric.units.as_deref().unwrap_or("");
+    let group = &metric.group;
+    let value: u32 = metric.graph_value.unwrap_or(0);
+    let short_name = metric.graph_short_name.as_deref().ok_or("no_name")?;
+    let graph_type = metric.graph_type.as_deref().unwrap_or("g");
 
     println!("Angelweb is at {}. Sending {:?}", angelweb_server, value);
 
@@ -19,7 +19,7 @@ pub fn run(result: WorkerResult, config: Config) ->  Result<(), Box<dyn std::err
     let client = reqwest::blocking::Client::new();
     let res = client.post(format!("{}//api/v1/metric", angelweb_server))
         .json(&json!({
-            "short_name": short_name.to_string(),
+            "short_name": short_name,
             "graph_value": value,
             "units": units,
             "group": group,

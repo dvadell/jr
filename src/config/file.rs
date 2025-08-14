@@ -1,8 +1,8 @@
 use std::fs;
 
-use crate::types::Config;
+use crate::types::Metric;
 
-fn parse_line(line: &str, curr_group: &str) -> Option<Config> {
+fn parse_line(line: &str, curr_group: &str) -> Option<Metric> {
     // Trim any leading/trailing whitespace and split the line by "::" up to 3 parts
     let mut parts = line.trim().splitn(4, "::");
     
@@ -16,7 +16,7 @@ fn parse_line(line: &str, curr_group: &str) -> Option<Config> {
                 eprintln!("Invalid N value in config file at line: {}", line);
                 return None;
             }
-            Some(Config {
+            Some(Metric {
                 n,
                 function: function.to_string(),
                 args: args.to_string(),
@@ -34,9 +34,9 @@ fn parse_line(line: &str, curr_group: &str) -> Option<Config> {
     }
 }
 
-pub fn parse_config() -> Vec<Config> {
+pub fn parse_config() -> Vec<Metric> {
     // Initialize a vector to store Config structures
-    let mut configs: Vec<Config> = Vec::new();
+    let mut configs: Vec<Metric> = Vec::new();
     let mut curr_group = "Default";
     
     // Read the configuration file. Return empty configs if no config file.

@@ -1,11 +1,11 @@
 use std::time::Instant;
 
-use crate::types::{Config,WorkerResult};
+use crate::types::Metric;
 
-pub fn run(config: Config) -> WorkerResult {
-    let url = match config.args.trim().is_empty() {
+pub fn run(mut metric: Metric) -> Metric {
+    let url = match metric.args.trim().is_empty() {
         true => "https://lwn.net",
-        false => config.args.trim()
+        false => metric.args.trim()
     };
     println!("Checking {}", url.to_string());
 
@@ -20,60 +20,52 @@ pub fn run(config: Config) -> WorkerResult {
             
             // Check the response status code
             if response.status().is_success() {
-                WorkerResult {
-                    value: duration,
-                    units: Some("ms".to_string()),
-                    message: "Success".to_string(),
-                    graph_value: Some(duration as u32),
-                    ..Default::default()
-                }
+                metric.value = Some(duration);
+                metric.units = Some("ms".to_string());
+                metric.message = Some("Success".to_string());
+                metric.graph_value = Some(duration as u32);
             } else {
-                WorkerResult {
-                    value: duration,
-                    units: Some("ms".to_string()),
-                    message: format!("HTTP error: {}", response.status()),
-                    graph_value: Some(duration as u32),
-                    ..Default::default()
-                }
+                metric.value = Some(duration);
+                metric.units = Some("ms".to_string());
+                metric.message = Some(format!("HTTP error: {}", response.status()));
+                metric.graph_value = Some(duration as u32);
             }
         },
         Err(_e) => {
-            WorkerResult {
-                value: 0.0,
-                units: Some("ms".to_string()),
-                message: "ERROR".to_string(),
-                ..Default::default()
-            }
+            metric.value = Some(0.0);
+            metric.units = Some("ms".to_string());
+            metric.message = Some("ERROR".to_string());
         }
     }
+    metric
 }
 
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::types::Config;
+    use crate::types::Metric;
 
     #[test]
     fn test_check_url_success() {
-        let config = Config {
+        let metric = Metric {
             args: "https://www.google.com".to_string(),
             ..Default::default()
         };
-        let result = run(config);
-        assert_eq!(result.message, "Success");
-        assert!(result.value > 0.0);
+        let result = run(metric);
+        assert_eq!(result.message, Some("Success".to_string()));
+        assert!(result.value.unwrap() > 0.0);
     }
 
     #[test]
     fn test_check_url_failure() {
-        let config = Config {
+        let metric = Metric {
             args: "https://nonexistent.url.fail".to_string(),
             ..Default::default()
         };
-        let result = run(config);
-        assert_eq!(result.message, "ERROR");
-        assert_eq!(result.value, 0.0);
+        let result = run(metric);
+        assert_eq!(result.message, Some("ERROR".to_string()));
+        assert_eq!(result.value, Some(0.0));
     }
 }
 

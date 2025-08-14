@@ -19,11 +19,11 @@ use worker::timethis as timethis;
 use worker::runthis as runthis;
 
 mod types;
-use crate::types::{WorkerResult,Config};
+use crate::types::Metric;
 
 
 fn main() {
-    let mut function_map: HashMap<String, fn(Config) -> WorkerResult> = HashMap::new();
+    let mut function_map: HashMap<String, fn(Metric) -> Metric> = HashMap::new();
 
     let mut configs = conf::parse_config();
     configs.extend_from_slice(&cmdline::parse_config());
@@ -44,14 +44,15 @@ fn main() {
         let start_time = now.elapsed().as_millis();
         let iteration = now.elapsed().as_secs();  // increments per second
 
-        for config in &configs {
-            if let Some(func) = function_map.get(&config.function) {
-                // Only run every config.n seconds
-                if iteration % config.n == 0 {
-                    let result = func(config.clone());
-                    let _ = out::run( result.clone(), config.clone() );
-                    let _ = graphite::run( result.clone(), config.clone() );
-                    let _ = angelweb::run( result.clone(), config.clone() );
+        for metric in &mut configs {
+            if let Some(func) = function_map.get(&metric.function) {
+                // Only run every metric.n seconds
+                if iteration % metric.n == 0 {
+                    let result_metric = func(metric.clone());
+                    *metric = result_metric;
+                    let _ = out::run( metric );
+                    let _ = graphite::run( metric );
+                    let _ = angelweb::run( metric );
                 }
             }
         }

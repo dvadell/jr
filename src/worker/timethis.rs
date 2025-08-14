@@ -1,10 +1,10 @@
 use std::process::Command;
 use std::io;
 use std::time::Instant;
-use crate::types::{Config,WorkerResult};
+use crate::types::Metric;
 
-pub fn run(config: Config) -> WorkerResult {
-    let command = config.args.as_str();
+pub fn run(mut metric: Metric) -> Metric {
+    let command = metric.args.as_str();
 
     let start = Instant::now();
 
@@ -12,28 +12,23 @@ pub fn run(config: Config) -> WorkerResult {
     match run_command(command) {
         Ok(_) => {
             println!("Command executed successfully.");
-            return WorkerResult { 
-                value: start.elapsed().as_millis() as f64,
-                units: Some("ms".to_string()),
-                message: "OK".to_string(),
-                graph_value: Some((start.elapsed().as_millis()) as u32),
-                graph_short_name: Some(config.short_name),
-                ..Default::default()
-            };
+            metric.value = Some(start.elapsed().as_millis() as f64);
+            metric.units = Some("ms".to_string());
+            metric.message = Some("OK".to_string());
+            metric.graph_value = Some(start.elapsed().as_millis() as u32);
+            metric.graph_short_name = Some(metric.short_name.clone());
 
         },
         Err(e) => {
             eprintln!("Failed to execute command: {}", e);
-            return WorkerResult { 
-                value: -1.0,
-                units: Some("ms".to_string()),
-                message: "Failed to execute command".to_string(),
-                graph_value: Some(0 as u32),
-                graph_short_name: Some(config.short_name),
-                ..Default::default()
-            };
+            metric.value = Some(-1.0);
+            metric.units = Some("ms".to_string());
+            metric.message = Some("Failed to execute command".to_string());
+            metric.graph_value = Some(0 as u32);
+            metric.graph_short_name = Some(metric.short_name.clone());
         },
     }
+    metric
 }
 
 
@@ -69,29 +64,29 @@ fn run_command(command: &str) -> io::Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::types::Config;
+    use crate::types::Metric;
 
     #[test]
     fn test_timethis_success() {
-        let config = Config {
+        let metric = Metric {
             args: "echo hello".to_string(),
             short_name: "test".to_string(),
             ..Default::default()
         };
-        let result = run(config);
-        assert_eq!(result.message, "OK");
-        assert!(result.value >= 0.0);
+        let result = run(metric);
+        assert_eq!(result.message, Some("OK".to_string()));
+        assert!(result.value.unwrap() >= 0.0);
     }
 
     #[test]
     fn test_timethis_failure() {
-        let config = Config {
+        let metric = Metric {
             args: "nonexistentcommand".to_string(),
             short_name: "test".to_string(),
             ..Default::default()
         };
-        let result = run(config);
-        assert_eq!(result.message, "Failed to execute command");
-        assert_eq!(result.value, -1.0);
+        let result = run(metric);
+        assert_eq!(result.message, Some("Failed to execute command".to_string()));
+        assert_eq!(result.value, Some(-1.0));
     }
 }

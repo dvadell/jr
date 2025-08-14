@@ -5,37 +5,34 @@ This document provides a more detailed look at the internals of `jr`, with a foc
 ## Project Structure
 
 - `src/main.rs`: The main entry point of the application.
-- `src/types.rs`: Defines the core data structures used throughout the application, such as `Config` and `WorkerResult`.
+- `src/types.rs`: Defines the core data structures used throughout the application, such as `Metric`.
 - `src/config/`: Handles parsing of the `jr.conf` file and command-line arguments.
 - `src/worker/`: Contains the worker plugins.
 - `src/output/`: Contains the output plugins.
 
 ## Core Data Structures
 
-- **`Config`**: This structure holds the configuration for a single test, as parsed from a line in `jr.conf` or from command-line arguments.
+The core data structure is **`Metric`**. It holds the configuration for a single test, and is then updated by the worker with the test result.
 
   ```rust
   #[derive(Debug, Clone, Default)]
-  pub struct Config {
-      pub n: u64,            // The interval in seconds
-      pub once: bool,          // Whether to run only once
-      pub function: String,  // The name of the worker function to call
-      pub args: String,        // The arguments to pass to the worker function
-      pub short_name: String // The name of the test
-  }
-  ```
+  pub struct Metric {
+      // From Config
+      pub n: u64,
+      pub once: bool,
+      pub function: String,
+      pub group: String,
+      pub args: String,
+      pub short_name: String,
 
-- **`WorkerResult`**: This structure is returned by worker plugins and contains the result of a test.
-
-  ```rust
-  #[derive(Debug, Clone)]
-  pub struct WorkerResult {
-      pub value: f64,
-      pub message: String,
+      // From WorkerResult
+      pub value: Option<f64>,
+      pub units: Option<String>,
+      pub message: Option<String>,
       pub graph_value: Option<u32>,
       pub graph_type: Option<String>,
       pub graph_name: Option<String>,
-      pub graph_short_name: Option<String>
+      pub graph_short_name: Option<String>,
   }
   ```
 
@@ -45,15 +42,14 @@ This document provides a more detailed look at the internals of `jr`, with a foc
 2.  **Define a `run` function** in your new file with the following signature:
 
     ```rust
-    use crate::types::{Config, WorkerResult};
+    use crate::types::Metric;
 
-    pub fn run(config: Config) -> WorkerResult {
+    pub fn run(mut metric: Metric) -> Metric {
         // Your plugin logic here
-        WorkerResult {
-            value: 1.0, // 1.0 for success, 0.0 for failure
-            message: "Test completed successfully".to_string(),
-            // ... other fields
-        }
+        metric.value = Some(1.0); // 1.0 for success, 0.0 for failure
+        metric.message = Some("Test completed successfully".to_string());
+        // ... other fields
+        metric
     }
     ```
 
@@ -75,11 +71,11 @@ This document provides a more detailed look at the internals of `jr`, with a foc
 2.  **Define a `run` function** in your new file with the following signature:
 
     ```rust
-    use crate::types::{Config, WorkerResult};
+    use crate::types::Metric;
 
-    pub fn run(result: WorkerResult, config: Config) -> Result<(), String> {
+    pub fn run(metric: &Metric) -> Result<(), String> {
         // Your output logic here
-        println!("Test '{}' result: {}", config.short_name, result.message);
+        println!("Test '{}' result: {}", metric.short_name, metric.message.as_deref().unwrap_or(""));
         Ok(())
     }
     ```
@@ -93,6 +89,7 @@ This document provides a more detailed look at the internals of `jr`, with a foc
 4.  **Call your output plugin** in `src/main.rs` after a worker plugin has been executed:
 
     ```rust
-    let result = func(config.clone());
-    let _ = my_output::run(result.clone(), config.clone());
+    let result_metric = func(metric.clone());
+    *metric = result_metric;
+    let _ = my_output::run(metric);
     ```

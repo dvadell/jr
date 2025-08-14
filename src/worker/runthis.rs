@@ -1,10 +1,10 @@
 use std::io::{self, Read};
 use std::process::{Command, Stdio};
-use crate::types::{Config,WorkerResult};
+use crate::types::Metric;
 use std::str::FromStr;
 
-pub fn run(config: Config) -> WorkerResult {
-    let command = config.args.as_str();
+pub fn run(mut metric: Metric) -> Metric {
+    let command = metric.args.as_str();
 
     match run_command(command) {
         Ok(output) => {
@@ -15,28 +15,23 @@ pub fn run(config: Config) -> WorkerResult {
                 Err(_e) => 0,
             };
 
-            return WorkerResult { 
-                value: value as f64,
-                units: None,
-                message: "OK".to_string(),
-                graph_value: Some(value as u32),
-                graph_short_name: Some(config.short_name),
-                ..Default::default()
-            };
+            metric.value = Some(value as f64);
+            metric.units = None;
+            metric.message = Some("OK".to_string());
+            metric.graph_value = Some(value as u32);
+            metric.graph_short_name = Some(metric.short_name.clone());
 
         },
         Err(e) => {
             eprintln!("Failed to execute command: {}", e);
-            return WorkerResult { 
-                value: -1.0,
-                units: None,
-                message: "Failed to execute command".to_string(),
-                graph_value: Some(0 as u32),
-                graph_short_name: Some(config.short_name),
-                ..Default::default()
-            };
+            metric.value = Some(-1.0);
+            metric.units = None;
+            metric.message = Some("Failed to execute command".to_string());
+            metric.graph_value = Some(0 as u32);
+            metric.graph_short_name = Some(metric.short_name.clone());
         },
     }
+    metric
 }
 
 
