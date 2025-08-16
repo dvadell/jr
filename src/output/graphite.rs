@@ -12,7 +12,7 @@ pub fn run(metric: &Metric) ->  Result<(), Box<dyn std::error::Error>>  {
     let socket = UdpSocket::bind("0.0.0.0:0")?;
 
     let graph_short_name = metric.graph_short_name.as_deref().unwrap_or(&metric.function);
-    let value = metric.graph_value.unwrap_or(metric.value.unwrap_or_default() as u32);
+    let value = metric.graph_value.unwrap_or(metric.value.unwrap_or_default() as i64);
 
     // Format the string according to the specified pattern
     let formatted_data = format!("jr.{}:{}|g", graph_short_name, value); // Graphite gauge needs int

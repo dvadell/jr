@@ -23,12 +23,12 @@ pub fn run(mut metric: Metric) -> Metric {
                 metric.value = Some(duration);
                 metric.units = Some("ms".to_string());
                 metric.message = Some("Success".to_string());
-                metric.graph_value = Some(duration as u32);
+                metric.graph_value = Some(duration as i64);
             } else {
-                metric.value = Some(duration);
+                metric.value = Some(-duration);
                 metric.units = Some("ms".to_string());
                 metric.message = Some(format!("HTTP error: {}", response.status()));
-                metric.graph_value = Some(duration as u32);
+                metric.graph_value = Some(-(duration as i64));
             }
         },
         Err(_e) => {

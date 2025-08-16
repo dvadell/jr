@@ -44,7 +44,7 @@ pub struct Metric {
     pub value: Option<f64>,
     pub units: Option<String>,
     pub message: Option<String>,
-    pub graph_value: Option<u32>,
+    pub graph_value: Option<i64>,
     pub graph_type: Option<String>,
     pub graph_name: Option<String>,
     pub graph_short_name: Option<String>,

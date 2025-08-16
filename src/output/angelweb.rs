@@ -26,7 +26,7 @@ pub fn run(metric: &Metric) ->  Result<(), Box<dyn std::error::Error>>  {
     // graph_value and graph_short_name
     let units = metric.units.as_deref().unwrap_or("");
     let group = &metric.group;
-    let value: u32 = metric.graph_value.unwrap_or(0);
+    let value: i64 = metric.graph_value.unwrap_or(0);
     let short_name = metric.graph_short_name.as_deref().ok_or("no_name")?;
     let graph_type = metric.graph_type.as_deref().unwrap_or("g");
 

@@ -15,7 +15,7 @@ pub fn run(mut metric: Metric) -> Metric {
             metric.value = Some(start.elapsed().as_millis() as f64);
             metric.units = Some("ms".to_string());
             metric.message = Some("OK".to_string());
-            metric.graph_value = Some(start.elapsed().as_millis() as u32);
+            metric.graph_value = Some(start.elapsed().as_millis() as i64);
             metric.graph_short_name = Some(metric.short_name.clone());
 
         },
@@ -24,7 +24,7 @@ pub fn run(mut metric: Metric) -> Metric {
             metric.value = Some(-1.0);
             metric.units = Some("ms".to_string());
             metric.message = Some("Failed to execute command".to_string());
-            metric.graph_value = Some(0 as u32);
+            metric.graph_value = Some(0 as i64);
             metric.graph_short_name = Some(metric.short_name.clone());
         },
     }

@@ -18,7 +18,7 @@ pub fn run(mut metric: Metric) -> Metric {
 
     metric.value = Some(load_avg.one * 100.0);
     metric.message = Some("Hey".to_string());
-    metric.graph_value = Some((load_avg.one * 100.0) as u32);
+    metric.graph_value = Some((load_avg.one * 100.0) as i64);
     metric.graph_short_name = Some(format!("load_avg_{}", hostname));
     metric
 }
