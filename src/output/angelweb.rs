@@ -14,6 +14,7 @@ pub fn run(metric: &Metric) ->  Result<(), Box<dyn std::error::Error>>  {
             "group": metric.group,
             "reporter": "jr@mordor",
             "type": metric.graph_type.as_deref().unwrap_or("g"),
+            "graph_type": metric.graph_type.as_deref().unwrap_or(""),
             "min_value": metric.min_value,
             "max_value": metric.max_value
         });
@@ -28,7 +29,7 @@ pub fn run(metric: &Metric) ->  Result<(), Box<dyn std::error::Error>>  {
     let group = &metric.group;
     let value: i64 = metric.graph_value.unwrap_or(0);
     let short_name = metric.graph_short_name.as_deref().ok_or("no_name")?;
-    let graph_type = metric.graph_type.as_deref().unwrap_or("g");
+    let graph_type = metric.graph_type.as_deref().unwrap_or("");
 
     println!("Angelweb is at {}. Sending {:?}", angelweb_server, value);
 
@@ -40,7 +41,7 @@ pub fn run(metric: &Metric) ->  Result<(), Box<dyn std::error::Error>>  {
         "units": units,
         "group": group,
         "reporter": "jr@mordor",
-        "type": graph_type,
+        "graph_type": graph_type,
         "min_value": metric.min_value,
         "max_value": metric.max_value
     });

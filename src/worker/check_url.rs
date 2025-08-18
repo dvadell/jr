@@ -18,6 +18,7 @@ pub fn run(mut metric: Metric) -> Metric {
         Ok(response) => {
             // Calculate the time taken
             let duration = start_time.elapsed().as_millis() as f64;
+            metric.graph_type = Some("time".to_string());
             
             // Check the response status code
             if response.status().is_success() {

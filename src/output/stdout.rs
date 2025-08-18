@@ -11,5 +11,9 @@ pub fn run(metric: &Metric) {
         output.push_str(&format!(", max: {}", max_value));
     }
 
+    if let Some(graph_type) = &metric.graph_type {
+        output.push_str(&format!(", graph_type: {}", graph_type));
+    }
+
     println!("{}", output);
 }

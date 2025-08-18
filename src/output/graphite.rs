@@ -14,8 +14,14 @@ pub fn run(metric: &Metric) ->  Result<(), Box<dyn std::error::Error>>  {
     let graph_short_name = metric.graph_short_name.as_deref().unwrap_or(&metric.function);
     let value = metric.graph_value.unwrap_or(metric.value.unwrap_or_default() as i64);
 
+    let metric_type = if metric.graph_type.as_deref() == Some("time") {
+        "ms" // Assuming units are always milliseconds for time
+    } else {
+        "g" // Default to gauge
+    };
+
     // Format the string according to the specified pattern
-    let formatted_data = format!("jr.{}:{}|g", graph_short_name, value); // Graphite gauge needs int
+    let formatted_data = format!("jr.{}:{}|{}", graph_short_name, value, metric_type);
     println!("{}", formatted_data);
     let data = formatted_data.into_bytes();
     

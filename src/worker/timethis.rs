@@ -16,6 +16,7 @@ pub fn run(mut metric: Metric) -> Metric {
             metric.units = Some("ms".to_string());
             metric.message = Some("OK".to_string());
             metric.graph_value = Some(start.elapsed().as_millis() as i64);
+            metric.graph_type = Some("time".to_string());
             metric.graph_short_name = Some(metric.short_name.clone());
 
         },
