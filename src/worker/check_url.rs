@@ -11,6 +11,7 @@ pub fn run(mut metric: Metric) -> Metric {
 
     // Start the timer
     let start_time = Instant::now();
+    metric.graph_short_name = Some(metric.short_name.clone());
 
     // Make the HTTP request
     match reqwest::blocking::get(url) {
