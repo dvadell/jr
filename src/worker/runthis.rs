@@ -24,10 +24,10 @@ pub fn run(mut metric: Metric) -> Metric {
         },
         Err(e) => {
             eprintln!("Failed to execute command: {}", e);
-            metric.value = Some((value as f64) *-1.0);
+            metric.value = Some(-1.0);
             metric.units = None;
             metric.message = Some("Failed to execute command".to_string());
-            metric.graph_value = Some((value as i64) * -1);
+            metric.graph_value = Some(-1);
             metric.graph_short_name = Some(metric.short_name.clone());
         },
     }
