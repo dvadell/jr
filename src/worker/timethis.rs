@@ -22,10 +22,10 @@ pub fn run(mut metric: Metric) -> Metric {
         },
         Err(e) => {
             eprintln!("Failed to execute command: {}", e);
-            metric.value = Some(-1.0);
+            metric.value = Some((start.elapsed().as_millis() as f64) * -1.0);
             metric.units = Some("ms".to_string());
             metric.message = Some("Failed to execute command".to_string());
-            metric.graph_value = Some(0 as i64);
+            metric.graph_value = Some((start.elapsed().as_millis() as i64) * -1);
             metric.graph_short_name = Some(metric.short_name.clone());
         },
     }
