@@ -17,6 +17,7 @@ pub fn run(metric: &Metric) ->  Result<(), Box<dyn std::error::Error>>  {
             "graph_type": metric.graph_type.as_deref().unwrap_or(""),
             "min_value": metric.min_value,
             "max_value": metric.max_value,
+            "every": if metric.once { -1 } else { metric.n as i64 },
             "status": metric.status
         });
         fs::write(output_file, serde_json::to_string_pretty(&payload)?)?;
@@ -45,6 +46,7 @@ pub fn run(metric: &Metric) ->  Result<(), Box<dyn std::error::Error>>  {
         "graph_type": graph_type,
         "min_value": metric.min_value,
         "max_value": metric.max_value,
+        "every": if metric.once { -1 } else { metric.n as i64 },
         "status": &metric.status
     });
 
@@ -61,5 +63,46 @@ pub fn run(metric: &Metric) ->  Result<(), Box<dyn std::error::Error>>  {
     } else {
         println!("Something else happened. Status: {:?}", res.status());
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::types::Metric;
+    use std::env;
+    use std::fs;
+    use serde_json::Value;
+    use tempfile::NamedTempFile;
+
+    #[test]
+    fn test_run_with_every() {
+        let output_file = NamedTempFile::new().unwrap();
+        let output_file_path = output_file.path().to_str().unwrap();
+        env::set_var("JR_TEST_OUTPUT_FILE", output_file_path);
+
+        // Test with a specific 'every' value
+        let metric1 = Metric {
+            n: 60,
+            once: false,
+            ..Default::default()
+        };
+        run(&metric1).unwrap();
+        let content = fs::read_to_string(output_file_path).unwrap();
+        let json: Value = serde_json::from_str(&content).unwrap();
+        assert_eq!(json["every"], 60);
+
+        // Test with 'once' set to true
+        let metric2 = Metric {
+            once: true,
+            ..Default::default()
+        };
+        run(&metric2).unwrap();
+        let content = fs::read_to_string(output_file_path).unwrap();
+        let json: Value = serde_json::from_str(&content).unwrap();
+        assert_eq!(json["every"], -1);
+
+        // Clean up
+        env::remove_var("JR_TEST_OUTPUT_FILE");
     }
 }

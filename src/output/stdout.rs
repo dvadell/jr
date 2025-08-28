@@ -1,7 +1,8 @@
 use crate::types::Metric;
 
 pub fn run(metric: &Metric) {
-    let mut output = format!("Value: {:.2} {:?}, message: {}, status: {}", metric.value.unwrap_or_default(), metric.units.as_deref().unwrap_or_default(), metric.message.as_deref().unwrap_or_default(), metric.status);
+    let every = if metric.once { -1 } else { metric.n as i64 };
+    let mut output = format!("Value: {:.2} {:?}, message: {}, status: {}, every: {}", metric.value.unwrap_or_default(), metric.units.as_deref().unwrap_or_default(), metric.message.as_deref().unwrap_or_default(), metric.status, every);
 
     if let Some(min_value) = metric.min_value {
         output.push_str(&format!(", min: {}", min_value));

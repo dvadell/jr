@@ -21,7 +21,8 @@ pub fn run(metric: &Metric) ->  Result<(), Box<dyn std::error::Error>>  {
     };
 
     // Format the string according to the specified pattern
-    let formatted_data = format!("jr.{}.{}:{}|{}", graph_short_name, metric.status, value, metric_type);
+    let every = if metric.once { -1 } else { metric.n as i64 };
+    let formatted_data = format!("jr.{};every={}.{}:{}|{}", graph_short_name, every, metric.status, value, metric_type);
     println!("{}", formatted_data);
     let data = formatted_data.into_bytes();
     
