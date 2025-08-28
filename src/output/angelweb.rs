@@ -16,7 +16,8 @@ pub fn run(metric: &Metric) ->  Result<(), Box<dyn std::error::Error>>  {
             "type": metric.graph_type.as_deref().unwrap_or("g"),
             "graph_type": metric.graph_type.as_deref().unwrap_or(""),
             "min_value": metric.min_value,
-            "max_value": metric.max_value
+            "max_value": metric.max_value,
+            "status": metric.status
         });
         fs::write(output_file, serde_json::to_string_pretty(&payload)?)?;
         return Ok(());
@@ -43,7 +44,8 @@ pub fn run(metric: &Metric) ->  Result<(), Box<dyn std::error::Error>>  {
         "reporter": "jr@mordor",
         "graph_type": graph_type,
         "min_value": metric.min_value,
-        "max_value": metric.max_value
+        "max_value": metric.max_value,
+        "status": &metric.status
     });
 
     if env::var("DEBUG").unwrap_or_else(|_| "0".to_string()) == "1" {

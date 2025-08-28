@@ -70,3 +70,59 @@ fn test_graph_type_angelweb_output() {
     assert_eq!(json_payload["graph_type"].as_str(), Some("time"));
     assert_eq!(json_payload["short_name"].as_str(), Some("test_graph_type_metric"));
 }
+
+#[test]
+fn test_status_error_angelweb_output() {
+    let temp_file = NamedTempFile::new().expect("Failed to create temporary file");
+    let temp_file_path = temp_file.path().to_str().expect("Failed to get temporary file path").to_string();
+
+    let output = Command::new("cargo")
+        .arg("run")
+        .arg("--")
+        .arg("--once")
+        .arg("--name")
+        .arg("test_status_error")
+        .arg("--worker")
+        .arg("check_url")
+        .arg("--")
+        .arg("http://nonexistent.url.fail")
+        .env("JR_TEST_OUTPUT_FILE", &temp_file_path)
+        .output()
+        .expect("Failed to execute command");
+
+    assert!(output.status.success(), "Command failed with stderr: {}", String::from_utf8_lossy(&output.stderr));
+
+    let file_content = fs::read_to_string(&temp_file_path).expect("Failed to read temporary file");
+    let json_payload: Value = serde_json::from_str(&file_content).expect("Failed to parse JSON from file content");
+
+    assert_eq!(json_payload["status"].as_str(), Some("error"));
+    assert_eq!(json_payload["short_name"].as_str(), Some("test_status_error"));
+}
+
+#[test]
+fn test_status_ok_angelweb_output() {
+    let temp_file = NamedTempFile::new().expect("Failed to create temporary file");
+    let temp_file_path = temp_file.path().to_str().expect("Failed to get temporary file path").to_string();
+
+    let output = Command::new("cargo")
+        .arg("run")
+        .arg("--")
+        .arg("--once")
+        .arg("--name")
+        .arg("test_status_ok")
+        .arg("--worker")
+        .arg("timethis")
+        .arg("--")
+        .arg("sleep 0.1")
+        .env("JR_TEST_OUTPUT_FILE", &temp_file_path)
+        .output()
+        .expect("Failed to execute command");
+
+    assert!(output.status.success(), "Command failed with stderr: {}", String::from_utf8_lossy(&output.stderr));
+
+    let file_content = fs::read_to_string(&temp_file_path).expect("Failed to read temporary file");
+    let json_payload: Value = serde_json::from_str(&file_content).expect("Failed to parse JSON from file content");
+
+    assert_eq!(json_payload["status"].as_str(), Some("ok"));
+    assert_eq!(json_payload["short_name"].as_str(), Some("test_status_ok"));
+}

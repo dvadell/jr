@@ -28,7 +28,7 @@ pub struct Args {
     pub version: bool,
 }
 
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone)]
 pub struct Metric {
     // From Config
     pub n: u64,
@@ -48,4 +48,28 @@ pub struct Metric {
     pub graph_type: Option<String>,
     pub graph_name: Option<String>,
     pub graph_short_name: Option<String>,
+    pub status: String,
+}
+
+impl Default for Metric {
+    fn default() -> Self {
+        Metric {
+            n: 0,
+            once: false,
+            function: String::new(),
+            group: String::new(),
+            args: String::new(),
+            short_name: String::new(),
+            min_value: None,
+            max_value: None,
+            value: None,
+            units: None,
+            message: None,
+            graph_value: None,
+            graph_type: None,
+            graph_name: None,
+            graph_short_name: None,
+            status: "ok".to_string(),
+        }
+    }
 }

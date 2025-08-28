@@ -31,12 +31,14 @@ pub fn run(mut metric: Metric) -> Metric {
                 metric.units = Some("ms".to_string());
                 metric.message = Some(format!("HTTP error: {}", response.status()));
                 metric.graph_value = Some(-(duration as i64));
+                metric.status = "error".to_string();
             }
         },
         Err(_e) => {
             metric.value = Some(0.0);
             metric.units = Some("ms".to_string());
             metric.message = Some("ERROR".to_string());
+            metric.status = "error".to_string();
         }
     }
     metric

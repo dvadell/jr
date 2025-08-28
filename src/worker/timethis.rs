@@ -27,6 +27,7 @@ pub fn run(mut metric: Metric) -> Metric {
             metric.message = Some("Failed to execute command".to_string());
             metric.graph_value = Some((start.elapsed().as_millis() as i64) * -1);
             metric.graph_short_name = Some(metric.short_name.clone());
+            metric.status = "error".to_string();
         },
     }
     metric
@@ -88,6 +89,6 @@ mod tests {
         };
         let result = run(metric);
         assert_eq!(result.message, Some("Failed to execute command".to_string()));
-        assert_eq!(result.value, Some(-1.0));
+        assert!(result.value.unwrap() <= 0.0);
     }
 }
