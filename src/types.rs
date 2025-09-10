@@ -46,7 +46,6 @@ pub struct Metric {
     pub message: Option<String>,
     pub graph_value: Option<i64>,
     pub graph_type: Option<String>,
-    pub graph_name: Option<String>,
     pub graph_short_name: Option<String>,
     pub status: String,
 }
@@ -67,7 +66,6 @@ impl Default for Metric {
             message: None,
             graph_value: None,
             graph_type: None,
-            graph_name: None,
             graph_short_name: None,
             status: "ok".to_string(),
         }

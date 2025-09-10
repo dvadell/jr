@@ -27,7 +27,7 @@ fn main() {
 
     let mut configs = conf::parse_config();
     configs.extend_from_slice(&cmdline::parse_config());
-    if configs.len() == 0 {
+    if configs.is_empty() {
         eprintln!("No configuration found. Please provide command-line arguments or a configuration file. Use `jr --help` for more information.");
         exit(1);
     }
@@ -51,7 +51,7 @@ fn main() {
                 if iteration % metric.n == 0 {
                     let result_metric = func(metric.clone());
                     *metric = result_metric;
-                    let _ = out::run(metric);
+                    out::run(metric);
                     let _ = graphite::run(metric);
                     let _ = angelweb::run(metric);
                 }

@@ -94,10 +94,8 @@ pub fn parse_config() -> Vec<Metric> {
             } else {
                 curr_max_value = None; // Reset to None if no value is provided
             }
-        } else {
-            if let Some(config) = parse_line(line, curr_group, curr_min_value, curr_max_value) {
-                configs.push(config);
-            }
+        } else if let Some(config) = parse_line(line, curr_group, curr_min_value, curr_max_value) {
+            configs.push(config);
         }
     }
     configs

@@ -2,6 +2,16 @@
 
 This document provides a more detailed look at the internals of `jr`, with a focus on how to create new plugins.
 
+## Compiling / Testing
+```
+cargo fmt
+cargo clippy  # or cargo clippy --fix --bin "jr" --allow-dirty to apply fixes
+cargo test
+cargo build
+. release.sh  # to create a statically-compiled binary
+```
+
+
 ## Project Structure
 
 - `src/main.rs`: The main entry point of the application.

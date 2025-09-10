@@ -83,14 +83,12 @@ fn run_command(command: &str) -> io::Result<String> {
 }
 
 fn parse_output(output: String) -> Result<Number, String> {
-    match i32::from_str(output.trim()) {
-        Ok(int_val) => return Ok(Number::Integer(int_val)),
-        Err(_) => (),
+    if let Ok(int_val) = i32::from_str(output.trim()) {
+        return Ok(Number::Integer(int_val));
     }
 
-    match f64::from_str(output.trim()) {
-        Ok(float_val) => return Ok(Number::Float(float_val)),
-        Err(_) => (),
+    if let Ok(float_val) = f64::from_str(output.trim()) {
+        return Ok(Number::Float(float_val));
     }
 
     Err(format!(

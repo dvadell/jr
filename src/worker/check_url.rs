@@ -7,7 +7,7 @@ pub fn run(mut metric: Metric) -> Metric {
         true => "https://lwn.net",
         false => metric.args.trim(),
     };
-    println!("Checking {}", url.to_string());
+    println!("Checking {}", url);
 
     // Start the timer
     let start_time = Instant::now();

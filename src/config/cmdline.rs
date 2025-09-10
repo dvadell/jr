@@ -24,10 +24,7 @@ pub fn parse_config_from_args(args: Vec<OsString>) -> Vec<Metric> {
         None => "timethis".to_string(),
     };
 
-    let every = match args.every {
-        Some(every) => every,
-        None => 9999999,
-    };
+    let every = args.every.unwrap_or(9999999);
 
     // Convert Vec<OsString> to String
     let remaining_args_str = args
@@ -63,7 +60,7 @@ pub fn parse_config_from_args(args: Vec<OsString>) -> Vec<Metric> {
     configs
 }
 
-fn placeholder_name(remaining_args_str: &String) -> String {
+fn placeholder_name(remaining_args_str: &str) -> String {
     let cmd_name = match remaining_args_str.split_whitespace().next() {
         Some(name) => name.to_string(),
         None => "".to_string(),
