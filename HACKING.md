@@ -24,15 +24,18 @@ The core data structure is **`Metric`**. It holds the configuration for a single
       pub group: String,
       pub args: String,
       pub short_name: String,
+      pub min_value: Option<f64>,
+      pub max_value: Option<f64>,
 
       // From WorkerResult
       pub value: Option<f64>,
       pub units: Option<String>,
       pub message: Option<String>,
-      pub graph_value: Option<u32>,
+      pub graph_value: Option<i64>,
       pub graph_type: Option<String>,
       pub graph_name: Option<String>,
       pub graph_short_name: Option<String>,
+      pub status: String,
   }
   ```
 
@@ -53,13 +56,21 @@ The core data structure is **`Metric`**. It holds the configuration for a single
     }
     ```
 
+    **Note:** Some output plugins, like `angelweb`, require specific fields to be set in the `Metric` struct. For example, `angelweb` requires `graph_short_name` to be set. It is good practice to set `metric.graph_short_name = Some(metric.short_name.clone());` in your worker if you want it to be compatible with the `angelweb` output plugin.
+
 3.  **Add your new module** to `src/worker/mod.rs`:
 
     ```rust
     pub mod my_plugin;
     ```
 
-4.  **Register your plugin** in `src/main.rs` by adding it to the `function_map`:
+4.  **Register your plugin** in `src/main.rs`. First add the `use` statement to bring your worker into scope:
+
+    ```rust
+    use worker::my_plugin as my_plugin;
+    ```
+
+    Then, add it to the `function_map`:
 
     ```rust
     function_map.insert("my_plugin".to_string(), my_plugin::run);
