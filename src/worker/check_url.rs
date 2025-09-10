@@ -30,7 +30,7 @@ pub fn run(mut metric: Metric) -> Metric {
                 metric.value = Some(-duration);
                 metric.units = Some("ms".to_string());
                 metric.message = Some(format!("HTTP error: {}", response.status()));
-                metric.graph_value = Some(-(duration as i64));
+                metric.graph_value = Some(duration as i64);
                 metric.status = "error".to_string();
             }
         },
