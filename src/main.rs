@@ -1,27 +1,26 @@
 use std::collections::HashMap;
-use std::time::{Duration, Instant};
-use std::thread::sleep;
 use std::process::exit;
+use std::thread::sleep;
+use std::time::{Duration, Instant};
 
 mod config;
-use config::file as conf;
 use config::cmdline;
+use config::file as conf;
 
 mod output;
-use output::stdout as out;
-use output::graphite;
 use output::angelweb;
+use output::graphite;
+use output::stdout as out;
 
 mod worker;
-use worker::check_url as check_url;
-use worker::load_avg as load_avg;
-use worker::timethis as timethis;
-use worker::runthis as runthis;
-use worker::df as df;
+use worker::check_url;
+use worker::df;
+use worker::load_avg;
+use worker::runthis;
+use worker::timethis;
 
 mod types;
 use crate::types::Metric;
-
 
 fn main() {
     let mut function_map: HashMap<String, fn(Metric) -> Metric> = HashMap::new();
@@ -44,7 +43,7 @@ fn main() {
 
     loop {
         let start_time = now.elapsed().as_millis();
-        let iteration = now.elapsed().as_secs();  // increments per second
+        let iteration = now.elapsed().as_secs(); // increments per second
 
         for metric in &mut configs {
             if let Some(func) = function_map.get(&metric.function) {
@@ -52,9 +51,9 @@ fn main() {
                 if iteration % metric.n == 0 {
                     let result_metric = func(metric.clone());
                     *metric = result_metric;
-                    let _ = out::run( metric );
-                    let _ = graphite::run( metric );
-                    let _ = angelweb::run( metric );
+                    let _ = out::run(metric);
+                    let _ = graphite::run(metric);
+                    let _ = angelweb::run(metric);
                 }
             }
         }
@@ -62,14 +61,13 @@ fn main() {
         // Wait for the next interval
         println!("Run took {}us", now.elapsed().as_millis() - start_time);
         let elapsed_nanos = now.elapsed().as_nanos();
-        sleep(Duration::new(0, 1_000_000_000 - (elapsed_nanos % 1_000_000_000) as u32 ));
+        sleep(Duration::new(
+            0,
+            1_000_000_000 - (elapsed_nanos % 1_000_000_000) as u32,
+        ));
 
         if configs.iter().any(|c| c.once) {
             break;
         }
     }
 }
-
-
-
-

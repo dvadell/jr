@@ -1,6 +1,6 @@
+use crate::types::Metric;
 use std::io::{self, Read};
 use std::process::{Command, Stdio};
-use crate::types::Metric;
 use std::str::FromStr;
 
 pub fn run(mut metric: Metric) -> Metric {
@@ -20,8 +20,7 @@ pub fn run(mut metric: Metric) -> Metric {
             metric.message = Some("OK".to_string());
             metric.graph_value = Some(value as i64);
             metric.graph_short_name = Some(metric.short_name.clone());
-
-        },
+        }
         Err(e) => {
             eprintln!("Failed to execute command: {}", e);
             metric.value = Some(-1.0);
@@ -30,11 +29,10 @@ pub fn run(mut metric: Metric) -> Metric {
             metric.graph_value = Some(-1);
             metric.graph_short_name = Some(metric.short_name.clone());
             metric.status = "error".to_string();
-        },
+        }
     }
     metric
 }
-
 
 fn run_command(command: &str) -> io::Result<String> {
     // Split the command into parts
@@ -73,7 +71,10 @@ fn run_command(command: &str) -> io::Result<String> {
     if !status.success() {
         return Err(io::Error::new(
             io::ErrorKind::Other,
-            format!("Command failed with status: {}. Error output: {}", status, stderr),
+            format!(
+                "Command failed with status: {}. Error output: {}",
+                status, stderr
+            ),
         ));
     }
 
@@ -92,13 +93,13 @@ fn parse_output(output: String) -> Result<Number, String> {
         Err(_) => (),
     }
 
-    Err(format!("Could not parse output as integer or float: {}", output))
+    Err(format!(
+        "Could not parse output as integer or float: {}",
+        output
+    ))
 }
-
 
 enum Number {
     Integer(i32),
     Float(f64),
 }
-
-

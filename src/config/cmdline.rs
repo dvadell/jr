@@ -1,10 +1,10 @@
 use clap::Parser;
-use std::ffi::OsString;
 use std::env;
+use std::ffi::OsString;
 
-use crate::types::{Metric,Args};
+use crate::types::{Args, Metric};
 
-pub fn parse_config() -> Vec<Metric>  {
+pub fn parse_config() -> Vec<Metric> {
     let args = env::args_os().collect::<Vec<_>>();
     parse_config_from_args(args)
 }
@@ -23,30 +23,32 @@ pub fn parse_config_from_args(args: Vec<OsString>) -> Vec<Metric> {
         Some(every) => every,
         None => "timethis".to_string(),
     };
-    
+
     let every = match args.every {
         Some(every) => every,
-        None => 9999999
+        None => 9999999,
     };
-    
+
     // Convert Vec<OsString> to String
-    let remaining_args_str = args.remaining_args.iter()
-    .map(|x| OsString::into_string(x.clone()))
-    .map(Result::unwrap)
-    .collect::<Vec<_>>()
-    .join(" ");
+    let remaining_args_str = args
+        .remaining_args
+        .iter()
+        .map(|x| OsString::into_string(x.clone()))
+        .map(Result::unwrap)
+        .collect::<Vec<_>>()
+        .join(" ");
 
     if remaining_args_str.is_empty() && (worker == "timethis" || worker == "runthis") {
         return Vec::new();
     }
-    
+
     println!("Arguments: {}", remaining_args_str);
-    
+
     let name = match &args.name {
         Some(name) => name,
-        None => &placeholder_name(&remaining_args_str)
+        None => &placeholder_name(&remaining_args_str),
     };
-    
+
     configs.push(Metric {
         n: every as u64,
         once: args.once,
@@ -64,15 +66,15 @@ pub fn parse_config_from_args(args: Vec<OsString>) -> Vec<Metric> {
 fn placeholder_name(remaining_args_str: &String) -> String {
     let cmd_name = match remaining_args_str.split_whitespace().next() {
         Some(name) => name.to_string(),
-        None => "".to_string()
+        None => "".to_string(),
     };
 
     let hostname = match env::var("HOSTNAME") {
         Ok(hostname) => hostname.to_string(),
-        Err(_) => "no_hostname".to_string()
+        Err(_) => "no_hostname".to_string(),
     };
 
-    format!("{}_{}", cmd_name , hostname)
+    format!("{}_{}", cmd_name, hostname)
 }
 
 #[cfg(test)]

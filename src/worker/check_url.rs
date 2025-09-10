@@ -5,7 +5,7 @@ use crate::types::Metric;
 pub fn run(mut metric: Metric) -> Metric {
     let url = match metric.args.trim().is_empty() {
         true => "https://lwn.net",
-        false => metric.args.trim()
+        false => metric.args.trim(),
     };
     println!("Checking {}", url.to_string());
 
@@ -19,7 +19,7 @@ pub fn run(mut metric: Metric) -> Metric {
             // Calculate the time taken
             let duration = start_time.elapsed().as_millis() as f64;
             metric.graph_type = Some("time".to_string());
-            
+
             // Check the response status code
             if response.status().is_success() {
                 metric.value = Some(duration);
@@ -33,7 +33,7 @@ pub fn run(mut metric: Metric) -> Metric {
                 metric.graph_value = Some(duration as i64);
                 metric.status = "error".to_string();
             }
-        },
+        }
         Err(_e) => {
             metric.value = Some(0.0);
             metric.units = Some("ms".to_string());
@@ -43,7 +43,6 @@ pub fn run(mut metric: Metric) -> Metric {
     }
     metric
 }
-
 
 #[cfg(test)]
 mod tests {
@@ -72,4 +71,3 @@ mod tests {
         assert_eq!(result.value, Some(0.0));
     }
 }
-

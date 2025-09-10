@@ -16,10 +16,7 @@ pub fn run(mut metric: Metric) -> Metric {
             metric.value = Some(used_percent);
             metric.graph_value = Some(used_percent as i64);
             metric.units = Some("%".to_string());
-            metric.message = Some(format!(
-                "{} has {:.2}% used space",
-                path, used_percent
-            ));
+            metric.message = Some(format!("{} has {:.2}% used space", path, used_percent));
             return metric;
         }
     }

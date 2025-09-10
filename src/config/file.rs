@@ -2,14 +2,24 @@ use std::fs;
 
 use crate::types::Metric;
 
-fn parse_line(line: &str, curr_group: &str, curr_min_value: Option<f64>, curr_max_value: Option<f64>) -> Option<Metric> {
+fn parse_line(
+    line: &str,
+    curr_group: &str,
+    curr_min_value: Option<f64>,
+    curr_max_value: Option<f64>,
+) -> Option<Metric> {
     // Trim any leading/trailing whitespace and split the line by "::" up to 3 parts
     let mut parts = line.trim().splitn(4, "::");
-    
-    if line.trim().is_empty() || line.trim_start().starts_with('#') || line.trim_start().starts_with("//") {
+
+    if line.trim().is_empty()
+        || line.trim_start().starts_with('#')
+        || line.trim_start().starts_with("//")
+    {
         // Ignore empty lines and comment lines starting with # or //
         None
-    } else if let (Some(short_name), Some(n_str), Some(function), Some(args)) = (parts.next(), parts.next(), parts.next(), parts.next()) {
+    } else if let (Some(short_name), Some(n_str), Some(function), Some(args)) =
+        (parts.next(), parts.next(), parts.next(), parts.next())
+    {
         // Parse the first part as an unsigned 64-bit integer (`n`)
         if let Ok(n) = n_str.parse::<u64>() {
             if n == 0 {
@@ -42,16 +52,16 @@ pub fn parse_config() -> Vec<Metric> {
     let mut curr_group = "Default";
     let mut curr_min_value: Option<f64> = None;
     let mut curr_max_value: Option<f64> = None;
-    
+
     // Read the configuration file. Return empty configs if no config file.
     let config = match fs::read_to_string("jr.conf") {
         Ok(content) => content,
-        Err(_) => return configs
+        Err(_) => return configs,
     };
-    
+
     // Split the content into lines
     let lines: Vec<&str> = config.trim().lines().collect();
-    
+
     // Iterate over each line and parse it into a Config structure
     for line in lines {
         if line.trim_start().starts_with("Group") {
@@ -210,4 +220,3 @@ test10::100::load_avg::localhost
 
     temp_dir.close().unwrap();
 }
-

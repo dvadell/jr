@@ -1,10 +1,10 @@
 // An output plugin to push the measure to angelweb.
+use crate::types::Metric;
+use serde_json::json;
 use std::env;
 use std::fs;
-use serde_json::json;
-use crate::types::Metric;
 
-pub fn run(metric: &Metric) ->  Result<(), Box<dyn std::error::Error>>  {
+pub fn run(metric: &Metric) -> Result<(), Box<dyn std::error::Error>> {
     // If JR_TEST_OUTPUT_FILE is set, write the JSON payload to the specified file
     if let Ok(output_file) = env::var("JR_TEST_OUTPUT_FILE") {
         let payload = json!({
@@ -24,7 +24,8 @@ pub fn run(metric: &Metric) ->  Result<(), Box<dyn std::error::Error>>  {
         return Ok(());
     }
 
-    let angelweb_server = env::var("ANGELWEB_SERVER").unwrap_or_else(|_| "http://127.0.0.1:4000".to_string());
+    let angelweb_server =
+        env::var("ANGELWEB_SERVER").unwrap_or_else(|_| "http://127.0.0.1:4000".to_string());
 
     // graph_value and graph_short_name
     let units = metric.units.as_deref().unwrap_or("");
@@ -33,7 +34,10 @@ pub fn run(metric: &Metric) ->  Result<(), Box<dyn std::error::Error>>  {
     let short_name = match metric.graph_short_name.as_deref() {
         Some(name) => name,
         None => {
-            eprintln!("Warning: metric '{}' is missing 'graph_short_name'. Skipping angelweb output.", metric.short_name);
+            eprintln!(
+                "Warning: metric '{}' is missing 'graph_short_name'. Skipping angelweb output.",
+                metric.short_name
+            );
             return Ok(());
         }
     };
@@ -57,10 +61,14 @@ pub fn run(metric: &Metric) ->  Result<(), Box<dyn std::error::Error>>  {
     });
 
     if env::var("DEBUG").unwrap_or_else(|_| "0".to_string()) == "1" {
-        println!("JSON payload: {}", serde_json::to_string_pretty(&payload).unwrap());
+        println!(
+            "JSON payload: {}",
+            serde_json::to_string_pretty(&payload).unwrap()
+        );
     }
 
-    let res = client.post(format!("{}//api/v1/metric", angelweb_server))
+    let res = client
+        .post(format!("{}//api/v1/metric", angelweb_server))
         .json(&payload)
         .send()?;
 
@@ -76,9 +84,9 @@ pub fn run(metric: &Metric) ->  Result<(), Box<dyn std::error::Error>>  {
 mod tests {
     use super::*;
     use crate::types::Metric;
+    use serde_json::Value;
     use std::env;
     use std::fs;
-    use serde_json::Value;
     use tempfile::NamedTempFile;
 
     #[test]

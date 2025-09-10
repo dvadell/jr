@@ -1,7 +1,7 @@
-use std::process::Command;
-use std::io;
-use std::time::Instant;
 use crate::types::Metric;
+use std::io;
+use std::process::Command;
+use std::time::Instant;
 
 pub fn run(mut metric: Metric) -> Metric {
     let command = metric.args.as_str();
@@ -18,8 +18,7 @@ pub fn run(mut metric: Metric) -> Metric {
             metric.graph_value = Some(start.elapsed().as_millis() as i64);
             metric.graph_type = Some("time".to_string());
             metric.graph_short_name = Some(metric.short_name.clone());
-
-        },
+        }
         Err(e) => {
             eprintln!("Failed to execute command: {}", e);
             metric.value = Some((start.elapsed().as_millis() as f64) * -1.0);
@@ -28,11 +27,10 @@ pub fn run(mut metric: Metric) -> Metric {
             metric.graph_value = Some((start.elapsed().as_millis() as i64) * -1);
             metric.graph_short_name = Some(metric.short_name.clone());
             metric.status = "error".to_string();
-        },
+        }
     }
     metric
 }
-
 
 fn run_command(command: &str) -> io::Result<()> {
     // Split the command into parts
@@ -47,9 +45,7 @@ fn run_command(command: &str) -> io::Result<()> {
     let args = &args[1..];
 
     // Spawn the command with standard input, output, and error set to ignore
-    let mut child = Command::new(cmd)
-        .args(args)
-        .spawn()?;
+    let mut child = Command::new(cmd).args(args).spawn()?;
 
     // Wait for the command to finish and get the exit status
     let status = child.wait()?;
@@ -88,7 +84,10 @@ mod tests {
             ..Default::default()
         };
         let result = run(metric);
-        assert_eq!(result.message, Some("Failed to execute command".to_string()));
+        assert_eq!(
+            result.message,
+            Some("Failed to execute command".to_string())
+        );
         assert!(result.value.unwrap() <= 0.0);
     }
 }

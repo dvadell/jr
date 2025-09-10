@@ -1,5 +1,5 @@
-use sysinfo::System;
 use crate::types::Metric;
+use sysinfo::System;
 
 pub fn run(mut metric: Metric) -> Metric {
     // Initialize the system info
@@ -13,7 +13,7 @@ pub fn run(mut metric: Metric) -> Metric {
 
     let hostname = match metric.args.trim().is_empty() {
         true => "localhost",
-        false => metric.args.trim()
+        false => metric.args.trim(),
     };
 
     metric.value = Some(load_avg.one * 100.0);
@@ -22,7 +22,6 @@ pub fn run(mut metric: Metric) -> Metric {
     metric.graph_short_name = Some(format!("load_avg_{}", hostname));
     metric
 }
-
 
 #[cfg(test)]
 mod tests {
