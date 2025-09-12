@@ -10,6 +10,8 @@ cargo test
 cargo build
 . release.sh    # to create a statically-compiled binary
 git tag v0.2.6  # or whatever version
+git push --tags
+git push --follow-tags
 ```
 
 
