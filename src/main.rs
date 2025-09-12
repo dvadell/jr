@@ -16,6 +16,7 @@ mod worker;
 use worker::check_url;
 use worker::df;
 use worker::load_avg;
+use worker::query_api;
 use worker::runthis;
 use worker::timethis;
 
@@ -40,6 +41,7 @@ fn main() {
     function_map.insert("timethis".to_string(), timethis::run);
     function_map.insert("runthis".to_string(), runthis::run);
     function_map.insert("df".to_string(), df::run);
+    function_map.insert("query_api".to_string(), query_api::run);
 
     loop {
         let start_time = now.elapsed().as_millis();
