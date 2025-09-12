@@ -1,0 +1,75 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'  # Triggers on version tags like v1.0.0, v2.1.3, etc.
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        override: true
+        
+    - name: Run tests
+      run: cargo test --verbose
+
+  build:
+    name: Build Release Binary
+    needs: test  # Only build if tests pass
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        target: x86_64-unknown-linux-gnu
+        override: true
+
+    - name: Build release binary
+      run: cargo build --release --target x86_64-unknown-linux-gnu
+
+    - name: Strip binary
+      run: strip target/x86_64-unknown-linux-gnu/release/jr
+
+    - name: Upload binary artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: jr-linux-x64
+        path: target/x86_64-unknown-linux-gnu/release/jr
+
+  release:
+    name: Create Release
+    needs: build  # Only release if build succeeds (which requires tests to pass)
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Download binary artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: jr-linux-x64
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        name: Release ${{ github.ref_name }}  # Uses the tag name as release name
+        tag_name: ${{ github.ref_name }}      # Uses the tag name as version
+        files: jr
+        generate_release_notes: true
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
