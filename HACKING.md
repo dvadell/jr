@@ -5,10 +5,11 @@ This document provides a more detailed look at the internals of `jr`, with a foc
 ## Compiling / Testing
 ```
 cargo fmt
-cargo clippy  # or cargo clippy --fix --bin "jr" --allow-dirty to apply fixes
+cargo clippy    # or cargo clippy --fix --bin "jr" --allow-dirty to apply fixes
 cargo test
 cargo build
-. release.sh  # to create a statically-compiled binary
+. release.sh    # to create a statically-compiled binary
+git tag v0.2.6  # or whatever version
 ```
 
 

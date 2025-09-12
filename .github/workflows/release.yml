@@ -55,6 +55,8 @@ jobs:
     name: Create Release
     needs: build  # Only release if build succeeds (which requires tests to pass)
     runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Required for gh release create
     
     steps:
     - name: Download binary artifact
@@ -63,13 +65,10 @@ jobs:
         name: jr-linux-x64
 
     - name: Create Release
-      uses: softprops/action-gh-release@v1
-      with:
-        name: Release ${{ github.ref_name }}  # Uses the tag name as release name
-        tag_name: ${{ github.ref_name }}      # Uses the tag name as version
-        files: jr
-        generate_release_notes: true
-        draft: false
-        prerelease: false
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        gh release create ${{ github.ref_name }} \
+          jr \
+          --title "Release ${{ github.ref_name }}" \
+          --generate-notes
